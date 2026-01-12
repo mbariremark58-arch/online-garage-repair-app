@@ -1,0 +1,145 @@
+{
+  "bookings": [
+    {
+      "id": "BK1704900000001",
+      "customerName": "Alice Thompson",
+      "customerEmail": "alice.thompson@email.com",
+      "customerPhone": "(555) 123-4567",
+      "carMake": "Toyota",
+      "carModel": "Camry",
+      "carYear": "2020",
+      "licensePlate": "ABC-1234",
+      "issueDescription": "Engine making unusual rattling noise when accelerating. Started about a week ago.",
+      "preferredDate": "2026-01-15",
+      "preferredTime": "09:00",
+      "status": "pending",
+      "mechanic": null,
+      "createdAt": "2026-01-10T08:30:00.000Z",
+      "updatedAt": "2026-01-10T08:30:00.000Z"
+    },
+    {
+      "id": "BK1704900000002",
+      "customerName": "Robert Martinez",
+      "customerEmail": "robert.m@email.com",
+      "customerPhone": "(555) 234-5678",
+      "carMake": "Honda",
+      "carModel": "Civic",
+      "carYear": "2019",
+      "licensePlate": "XYZ-5678",
+      "issueDescription": "Brake pads need replacement. Squeaking sound when braking.",
+      "preferredDate": "2026-01-14",
+      "preferredTime": "14:00",
+      "status": "in-progress",
+      "mechanic": 2,
+      "createdAt": "2026-01-09T10:15:00.000Z",
+      "updatedAt": "2026-01-12T11:20:00.000Z"
+    },
+    {
+      "id": "BK1704900000003",
+      "customerName": "Jennifer Lee",
+      "customerEmail": "jennifer.lee@email.com",
+      "customerPhone": "(555) 345-6789",
+      "carMake": "Ford",
+      "carModel": "Explorer",
+      "carYear": "2021",
+      "licensePlate": "DEF-9012",
+      "issueDescription": "Oil change and general maintenance checkup needed.",
+      "preferredDate": "2026-01-13",
+      "preferredTime": "10:30",
+      "status": "completed",
+      "mechanic": 1,
+      "createdAt": "2026-01-08T09:00:00.000Z",
+      "updatedAt": "2026-01-13T16:45:00.000Z"
+    },
+    {
+      "id": "BK1704900000004",
+      "customerName": "Michael Chen",
+      "customerEmail": "michael.chen@email.com",
+      "customerPhone": "(555) 456-7890",
+      "carMake": "Tesla",
+      "carModel": "Model 3",
+      "carYear": "2023",
+      "licensePlate": "GHI-3456",
+      "issueDescription": "Battery charging issue. Car not reaching full charge capacity.",
+      "preferredDate": "2026-01-16",
+      "preferredTime": "11:00",
+      "status": "pending",
+      "mechanic": null,
+      "createdAt": "2026-01-11T14:22:00.000Z",
+      "updatedAt": "2026-01-11T14:22:00.000Z"
+    },
+    {
+      "id": "BK1704900000005",
+      "customerName": "Sarah Williams",
+      "customerEmail": "sarah.w@email.com",
+      "customerPhone": "(555) 567-8901",
+      "carMake": "BMW",
+      "carModel": "X5",
+      "carYear": "2022",
+      "licensePlate": "JKL-7890",
+      "issueDescription": "Air conditioning not working properly. Only blowing warm air.",
+      "preferredDate": "2026-01-15",
+      "preferredTime": "13:30",
+      "status": "in-progress",
+      "mechanic": 3,
+      "createdAt": "2026-01-10T11:45:00.000Z",
+      "updatedAt": "2026-01-12T09:30:00.000Z"
+    }
+  ],
+  "mechanics": [
+    {
+      "id": 1,
+      "name": "John Smith",
+      "specialization": "Engine & Transmission",
+      "experience": "10 years"
+    },
+    {
+      "id": 2,
+      "name": "Sarah Johnson",
+      "specialization": "Brakes & Suspension",
+      "experience": "8 years"
+    },
+    {
+      "id": 3,
+      "name": "Mike Williams",
+      "specialization": "Electrical Systems",
+      "experience": "12 years"
+    },
+    {
+      "id": 4,
+      "name": "Emily Brown",
+      "specialization": "General Maintenance",
+      "experience": "6 years"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1704900000001,
+      "bookingId": "BK1704900000001",
+      "message": "New booking created for Alice Thompson",
+      "timestamp": "2026-01-10T08:30:00.000Z",
+      "read": false
+    },
+    {
+      "id": 1704900000002,
+      "bookingId": "BK1704900000002",
+      "message": "Mechanic Sarah Johnson assigned",
+      "timestamp": "2026-01-12T11:20:00.000Z",
+      "read": false
+    },
+    {
+      "id": 1704900000003,
+      "bookingId": "BK1704900000002",
+      "message": "Status updated to in-progress",
+      "timestamp": "2026-01-12T11:20:00.000Z",
+      "read": false
+    },
+    {
+      "id": 1704900000004,
+      "bookingId": "BK1704900000003",
+      "message": "Status updated to completed",
+      "timestamp": "2026-01-13T16:45:00.000Z",
+      "read": true
+    }
+  ]
+}
