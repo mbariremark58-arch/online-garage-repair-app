@@ -32,7 +32,6 @@ const adminViewBtn = document.getElementById('adminViewBtn');
 const customerView = document.getElementById('customerView');
 const adminView = document.getElementById('adminView');
 const bookingForm = document.getElementById('bookingForm');
-const generateFakeDataBtn = document.getElementById('generateFakeDataBtn');
 const trackBookingBtn = document.getElementById('trackBookingBtn');
 const statusFilter = document.getElementById('statusFilter');
 const notification = document.getElementById('notification');
@@ -53,31 +52,6 @@ adminViewBtn.addEventListener('click', () => {
     adminViewBtn.classList.add('active');
     customerViewBtn.classList.remove('active');
     renderAdminDashboard();
-});
-
-// Generate Fake Data using Faker.js
-generateFakeDataBtn.addEventListener('click', () => {
-    if (typeof faker === 'undefined') {
-        showNotification('Faker.js not loaded!', 'error');
-        return;
-    }
-
-    document.getElementById('customerName').value = faker.person.fullName();
-    document.getElementById('customerEmail').value = faker.internet.email();
-    document.getElementById('customerPhone').value = faker.phone.number();
-    document.getElementById('carMake').value = faker.vehicle.manufacturer();
-    document.getElementById('carModel').value = faker.vehicle.model();
-    document.getElementById('carYear').value = faker.number.int({ min: 2000, max: 2024 });
-    document.getElementById('licensePlate').value = faker.vehicle.vrm();
-    document.getElementById('issueDescription').value = `${faker.vehicle.type()} having issues with ${faker.helpers.arrayElement(['engine', 'brakes', 'transmission', 'electrical system', 'suspension'])}. ${faker.lorem.sentence()}`;
-    
-    const today = new Date();
-    const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + faker.number.int({ min: 1, max: 14 }));
-    document.getElementById('preferredDate').value = futureDate.toISOString().split('T')[0];
-    document.getElementById('preferredTime').value = `${faker.number.int({ min: 8, max: 17 }).toString().padStart(2, '0')}:00`;
-
-    showNotification('Test data generated!');
 });
 
 // Submit Booking Form
