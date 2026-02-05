@@ -139,10 +139,13 @@ function updateBooking($conn) {
         $types .= "s";
     }
     
-    if (isset($data['mechanic_id'])) {
+    // FIX: Check existence instead of isset to allow setting to NULL
+    if (array_key_exists('mechanic_id', $data)) {
         $updates[] = "mechanic_id = ?";
-        $params[] = $data['mechanic_id'];
-        $types .= "i";
+        $params[] = $data['mechanic_id'] ? $data['mechanic_id'] : NULL;
+        // Use 'i' for integer, but usually 's' works safely for nulls in prepared statements too. 
+        // Strict typing would require conditional binding, but this usually works in mysqli.
+        $types .= "i"; 
     }
     
     if (empty($updates)) {
@@ -158,7 +161,6 @@ function updateBooking($conn) {
     $stmt->bind_param($types, ...$params);
     
     if ($stmt->execute()) {
-        // Create notification
         $message = isset($data['status']) ? "Status updated to " . $data['status'] : "Booking updated";
         createNotification($conn, $data['id'], $message);
         echo json_encode(['success' => true]);

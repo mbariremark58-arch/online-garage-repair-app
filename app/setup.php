@@ -40,7 +40,8 @@ $sql = "CREATE TABLE IF NOT EXISTS bookings (
     status ENUM('pending', 'in-progress', 'completed') DEFAULT 'pending',
     mechanic_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (mechanic_id) REFERENCES mechanics(id) ON DELETE SET NULL
 )";
 
 if ($conn->query($sql) === TRUE) {

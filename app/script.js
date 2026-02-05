@@ -257,6 +257,9 @@ function renderAdminBookings() {
 
 // Assign Mechanic
 async function assignMechanic(bookingId, mechanicId) {
+    // FIX: Handle unassignment (NaN or 0) by converting to null
+    const finalMechanicId = (isNaN(mechanicId) || mechanicId === 0) ? null : mechanicId;
+
     try {
         const response = await fetch(`${API_URL}?action=update_booking`, {
             method: 'POST',
@@ -265,15 +268,15 @@ async function assignMechanic(bookingId, mechanicId) {
             },
             body: JSON.stringify({
                 id: bookingId,
-                mechanic_id: mechanicId
+                mechanic_id: finalMechanicId
             })
         });
 
         const result = await response.json();
 
         if (result.success) {
-            showNotification('Mechanic assigned successfully!');
-            await loadDatabase();
+            showNotification('Mechanic updated successfully!');
+            await loadDatabase(); // Refresh to show changes
             renderAdminDashboard();
         } else {
             showNotification('Error assigning mechanic', 'error');
