@@ -40,7 +40,8 @@ if ($conn->query($sql) === TRUE) {
 
 // Create bookings table
 $sql = "CREATE TABLE IF NOT EXISTS bookings (
-    id VARCHAR(50) PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_ref VARCHAR(50) UNIQUE,
     customer_name VARCHAR(100) NOT NULL,
     customer_email VARCHAR(100) NOT NULL,
     customer_phone VARCHAR(20) NOT NULL,

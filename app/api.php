@@ -55,6 +55,16 @@ $db->query("CREATE TABLE IF NOT EXISTS notifications (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
 
+// ================= GET MECHANICS =================
+if ($action === 'get_mechanics') {
+    $result = $db->query("SELECT * FROM mechanics");
+    $mechanics = [];
+    while ($row = $result->fetch_assoc()) {
+        $mechanics[] = $row;
+    }
+    echo json_encode($mechanics);
+    exit;
+}
 
 // ================= INSERT SAMPLE MECHANICS =================
 $result = $db->query("SELECT COUNT(*) as count FROM mechanics");
@@ -116,7 +126,22 @@ if ($action === 'create_booking') {
     ]);
     exit;
 }
+// ================= TRACK BOOKINGS =================
+if ($action === 'track_bookings') {
+    $email = $_GET['email'] ?? '';
+    $stmt = $db->prepare("SELECT * FROM bookings WHERE customer_email = ? ORDER BY created_at DESC");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    $bookings = [];
+    while ($row = $result->fetch_assoc()) {
+        $bookings[] = $row;
+    }
+
+    echo json_encode($bookings);
+    exit;
+}
 
 // ================= GET BOOKINGS =================
 if ($action === 'get_bookings') {

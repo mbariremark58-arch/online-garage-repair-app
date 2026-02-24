@@ -57,7 +57,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="carYear">Year *</label>
-                            <input type="number" id="carYear" min="1990" max="2025" required>
+                            <input type="number" id="carYear" min="1990" max="2026" required>
                         </div>
                         <div class="form-group">
                             <label for="licensePlate">License Plate *</label>
