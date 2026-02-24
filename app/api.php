@@ -1,109 +1,96 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-require_once 'config.php';
-
-$method = $_SERVER['REQUEST_METHOD'];
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-
-// Handle different API endpoints
-switch ($action) {
-    case 'get_bookings':
-        getBookings($conn);
-        break;
-    
-    case 'get_booking':
-        getBooking($conn);
-        break;
-    
-    case 'create_booking':
-        createBooking($conn);
-        break;
-    
-    case 'update_booking':
-        updateBooking($conn);
-        break;
-    
-    case 'delete_booking':
-        deleteBooking($conn);
-        break;
-    
-    case 'get_mechanics':
-        getMechanics($conn);
-        break;
-    
-    case 'get_notifications':
-        getNotifications($conn);
-        break;
-    
-    case 'track_bookings':
-        trackBookings($conn);
-        break;
-    
-    case 'get_stats':
-        getStats($conn);
-        break;
-    
-    default:
-        echo json_encode(['error' => 'Invalid action']);
-        break;
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
 }
 
-// Get all bookings
-function getBookings($conn) {
-    $status = isset($_GET['status']) ? $_GET['status'] : 'all';
-    
-    $sql = "SELECT * FROM bookings";
-    if ($status !== 'all') {
-        $sql .= " WHERE status = ?";
-    }
-    $sql .= " ORDER BY created_at DESC";
-    
-    if ($status !== 'all') {
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $status);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $result = $conn->query($sql);
-    }
-    
-    $bookings = [];
-    while ($row = $result->fetch_assoc()) {
-        $bookings[] = $row;
-    }
-    
-    echo json_encode($bookings);
+$db = new mysqli('localhost', 'root', '', 'car_repair_shop');
+
+if ($db->connect_error) {
+    echo json_encode(['error' => 'Database connection failed']);
+    exit;
 }
 
-// Get single booking
-function getBooking($conn) {
-    $id = $_GET['id'];
-    
-    $stmt = $conn->prepare("SELECT * FROM bookings WHERE id = ?");
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        echo json_encode($row);
-    } else {
-        echo json_encode(['error' => 'Booking not found']);
-    }
+$db->set_charset('utf8');
+
+
+// ================= CREATE TABLES =================
+$db->query("CREATE TABLE IF NOT EXISTS mechanics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    specialization VARCHAR(100),
+    experience VARCHAR(50)
+)");
+
+$db->query("CREATE TABLE IF NOT EXISTS bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_ref VARCHAR(50) UNIQUE,
+    customer_name VARCHAR(100),
+    customer_email VARCHAR(100),
+    customer_phone VARCHAR(20),
+    car_make VARCHAR(50),
+    car_model VARCHAR(50),
+    car_year VARCHAR(4),
+    license_plate VARCHAR(20),
+    issue_description TEXT,
+    preferred_date DATE,
+    preferred_time TIME,
+    status VARCHAR(50) DEFAULT 'pending',
+    mechanic_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
+$db->query("CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    booking_id INT,
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)");
+
+
+// ================= INSERT SAMPLE MECHANICS =================
+$result = $db->query("SELECT COUNT(*) as count FROM mechanics");
+$row = $result->fetch_assoc();
+
+if ($row['count'] == 0) {
+    $db->query("INSERT INTO mechanics (name, specialization, experience) VALUES
+        ('John Smith', 'Engine & Transmission', '10 years'),
+        ('Sarah Johnson', 'Brakes & Suspension', '8 years'),
+        ('Mike Williams', 'Electrical Systems', '12 years'),
+        ('Emily Brown', 'General Maintenance', '6 years')");
 }
 
-// Create new booking
-function createBooking($conn) {
+$action = $_GET['action'] ?? '';
+
+
+// ================= CREATE BOOKING =================
+if ($action === 'create_booking') {
+
     $data = json_decode(file_get_contents('php://input'), true);
-    
-    $id = 'BK' . time();
-    $stmt = $conn->prepare("INSERT INTO bookings (id, customer_name, customer_email, customer_phone, car_make, car_model, car_year, license_plate, issue_description, preferred_date, preferred_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-    
-    $stmt->bind_param("sssssssssss", 
-        $id,
+
+    if (!$data) {
+        echo json_encode(['error' => 'Invalid JSON input']);
+        exit;
+    }
+
+    // 🔥 Generate UNIQUE booking reference safely
+    $booking_ref = 'BK' . strtoupper(uniqid());
+
+    $stmt = $db->prepare("INSERT INTO bookings 
+        (booking_ref, customer_name, customer_email, customer_phone, car_make, car_model, car_year, license_plate, issue_description, preferred_date, preferred_time)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param(
+        "sssssssssss",
+        $booking_ref,
         $data['customerName'],
         $data['customerEmail'],
         $data['customerPhone'],
@@ -115,140 +102,87 @@ function createBooking($conn) {
         $data['preferredDate'],
         $data['preferredTime']
     );
-    
-    if ($stmt->execute()) {
-        // Create notification
-        createNotification($conn, $id, "New booking created for " . $data['customerName']);
-        echo json_encode(['success' => true, 'id' => $id]);
-    } else {
+
+    if (!$stmt->execute()) {
         echo json_encode(['error' => $stmt->error]);
+        exit;
     }
+
+    $stmt->close();
+
+    echo json_encode([
+        'success' => true,
+        'booking_ref' => $booking_ref
+    ]);
+    exit;
 }
 
-// Update booking
-function updateBooking($conn) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    
-    $updates = [];
-    $params = [];
-    $types = "";
-    
-    if (isset($data['status'])) {
-        $updates[] = "status = ?";
-        $params[] = $data['status'];
-        $types .= "s";
-    }
-    
-    // FIX: Check existence instead of isset to allow setting to NULL
-    if (array_key_exists('mechanic_id', $data)) {
-        $updates[] = "mechanic_id = ?";
-        $params[] = $data['mechanic_id'] ? $data['mechanic_id'] : NULL;
-        // Use 'i' for integer, but usually 's' works safely for nulls in prepared statements too. 
-        // Strict typing would require conditional binding, but this usually works in mysqli.
-        $types .= "i"; 
-    }
-    
-    if (empty($updates)) {
-        echo json_encode(['error' => 'No fields to update']);
-        return;
-    }
-    
-    $sql = "UPDATE bookings SET " . implode(", ", $updates) . " WHERE id = ?";
-    $params[] = $data['id'];
-    $types .= "s";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param($types, ...$params);
-    
-    if ($stmt->execute()) {
-        $message = isset($data['status']) ? "Status updated to " . $data['status'] : "Booking updated";
-        createNotification($conn, $data['id'], $message);
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['error' => $stmt->error]);
-    }
-}
 
-// Delete booking
-function deleteBooking($conn) {
-    $id = $_GET['id'];
-    
-    $stmt = $conn->prepare("DELETE FROM bookings WHERE id = ?");
-    $stmt->bind_param("s", $id);
-    
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['error' => $stmt->error]);
-    }
-}
+// ================= GET BOOKINGS =================
+if ($action === 'get_bookings') {
 
-// Get mechanics
-function getMechanics($conn) {
-    $result = $conn->query("SELECT * FROM mechanics");
-    
-    $mechanics = [];
-    while ($row = $result->fetch_assoc()) {
-        $mechanics[] = $row;
-    }
-    
-    echo json_encode($mechanics);
-}
+    $result = $db->query("SELECT * FROM bookings ORDER BY created_at DESC");
 
-// Get notifications
-function getNotifications($conn) {
-    $result = $conn->query("SELECT * FROM notifications ORDER BY timestamp DESC LIMIT 50");
-    
-    $notifications = [];
-    while ($row = $result->fetch_assoc()) {
-        $notifications[] = $row;
-    }
-    
-    echo json_encode($notifications);
-}
-
-// Track bookings by email
-function trackBookings($conn) {
-    $email = $_GET['email'];
-    
-    $stmt = $conn->prepare("SELECT * FROM bookings WHERE customer_email = ? ORDER BY created_at DESC");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
     $bookings = [];
     while ($row = $result->fetch_assoc()) {
         $bookings[] = $row;
     }
-    
+
     echo json_encode($bookings);
+    exit;
 }
 
-// Get statistics
-function getStats($conn) {
-    $stats = [];
-    
-    $result = $conn->query("SELECT COUNT(*) as total FROM bookings");
-    $stats['total'] = $result->fetch_assoc()['total'];
-    
-    $result = $conn->query("SELECT COUNT(*) as pending FROM bookings WHERE status = 'pending'");
-    $stats['pending'] = $result->fetch_assoc()['pending'];
-    
-    $result = $conn->query("SELECT COUNT(*) as in_progress FROM bookings WHERE status = 'in-progress'");
-    $stats['in_progress'] = $result->fetch_assoc()['in_progress'];
-    
-    $result = $conn->query("SELECT COUNT(*) as completed FROM bookings WHERE status = 'completed'");
-    $stats['completed'] = $result->fetch_assoc()['completed'];
-    
-    echo json_encode($stats);
+
+// ================= UPDATE BOOKING =================
+if ($action === 'update_booking') {
+
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = $data['id'] ?? '';
+
+    if (!$id) {
+        echo json_encode(['error' => 'Missing ID']);
+        exit;
+    }
+
+    if (isset($data['status'])) {
+        $stmt = $db->prepare("UPDATE bookings SET status = ? WHERE id = ?");
+        $stmt->bind_param("si", $data['status'], $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    if (array_key_exists('mechanic_id', $data)) {
+        if ($data['mechanic_id']) {
+            $stmt = $db->prepare("UPDATE bookings SET mechanic_id = ? WHERE id = ?");
+            $stmt->bind_param("ii", $data['mechanic_id'], $id);
+        } else {
+            $stmt = $db->prepare("UPDATE bookings SET mechanic_id = NULL WHERE id = ?");
+            $stmt->bind_param("i", $id);
+        }
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    echo json_encode(['success' => true]);
+    exit;
 }
 
-// Create notification
-function createNotification($conn, $booking_id, $message) {
-    $stmt = $conn->prepare("INSERT INTO notifications (booking_id, message) VALUES (?, ?)");
-    $stmt->bind_param("ss", $booking_id, $message);
+
+// ================= DELETE BOOKING =================
+if ($action === 'delete_booking') {
+
+    $id = $_GET['id'] ?? '';
+
+    $stmt = $db->prepare("DELETE FROM bookings WHERE id = ?");
+    $stmt->bind_param("i", $id);
     $stmt->execute();
+    $stmt->close();
+
+    echo json_encode(['success' => true]);
+    exit;
 }
 
-$conn->close();
-?>
+
+// ================= INVALID ACTION =================
+echo json_encode(['error' => 'Invalid action']);
+exit;
