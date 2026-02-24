@@ -64,9 +64,23 @@ function setupEventListeners() {
     adminViewBtn?.addEventListener('click', async () => {
         adminView.classList.add('active');
         customerView.classList.remove('active');
-        await loadDatabase();
-        renderAdminDashboard();
+
+        const isLoaded = await loadDatabase();
+        if (isLoaded){
+            renderAdminDashboard();
+
+            updateAdminStats();
+        }
     });
+
+// ================= UPDATE ADMIN STATS =================
+function updateAdminStats(){
+    const bookings = database.bookings;
+    document.getElementById('totalBookings').textContent = bookings.length;
+    document.getElementById('pendingBookings').textContent = bookings.filter(b => b.status === 'pending').length;
+    document.getElementById('inProgressBookings').textContent = bookings.filter(b => b.status === 'in_progress').length;
+    document.getElementById('completedBookings').textContent = bookings.filter(b => b.status === 'completed').length;
+}
 
     // Submit booking
     bookingForm?.addEventListener('submit', handleBookingSubmit);
