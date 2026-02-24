@@ -24,6 +24,20 @@ if ($conn->query($sql) === TRUE) {
 // Select database
 $conn->select_db('car_repair_shop');
 
+// Create mechanics table FIRST (before bookings since bookings references it)
+$sql = "CREATE TABLE IF NOT EXISTS mechanics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    specialization VARCHAR(100),
+    experience VARCHAR(50)
+)";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Table 'mechanics' created successfully<br>";
+} else {
+    echo "Error creating table: " . $conn->error . "<br>";
+}
+
 // Create bookings table
 $sql = "CREATE TABLE IF NOT EXISTS bookings (
     id VARCHAR(50) PRIMARY KEY,
@@ -46,20 +60,6 @@ $sql = "CREATE TABLE IF NOT EXISTS bookings (
 
 if ($conn->query($sql) === TRUE) {
     echo "Table 'bookings' created successfully<br>";
-} else {
-    echo "Error creating table: " . $conn->error . "<br>";
-}
-
-// Create mechanics table
-$sql = "CREATE TABLE IF NOT EXISTS mechanics (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    specialization VARCHAR(100),
-    experience VARCHAR(50)
-)";
-
-if ($conn->query($sql) === TRUE) {
-    echo "Table 'mechanics' created successfully<br>";
 } else {
     echo "Error creating table: " . $conn->error . "<br>";
 }
