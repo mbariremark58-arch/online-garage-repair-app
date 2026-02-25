@@ -6,13 +6,13 @@ define('DB_PASS', '');
 define('DB_NAME', 'car_repair_shop');
 
 // Create connection
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($db->connect_error) {
+    die("Connection failed: " . $db->connect_error);
 }
 
 // Set charset to utf8
-$conn->set_charset("utf8");
+$db->set_charset("utf8");
 ?>
