@@ -1,4 +1,6 @@
 <?php
+session_start(); //Enable sessions across the app
+
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
@@ -15,4 +17,4 @@ if ($db->connect_error) {
 
 // Set charset to utf8
 $db->set_charset("utf8");
-?>
+?> 

@@ -13,8 +13,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require_once 'config.php';
+$action = $_GET['action'] ?? ''; //To prevent warnings
 
-$action = $_GET['action'] ?? '';
+if ($action === 'admin_login') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    // Simple prototype logic; use password_verify() in production
+    if ($data['username'] === 'admin' && $data['password'] === 'password123') {
+        $_SESSION['admin_logged_in'] = true;
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+    }
+    exit;
+}
+
+//Protect middleware
+$protected_actions = ['get_bookings', 'update_booking', 'delete_booking'];
+if (in_array($action, $protected_actions) && !isset($_SESSION['admin_logged_in'])) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Forbidden: Admin access required']);
+    exit;
+}
 
 // ================= GET MECHANICS =================
 if ($action === 'get_mechanics') {
@@ -64,7 +84,7 @@ if ($action === 'create_booking') {
     if (!$stmt->execute()) {
         echo json_encode(['error' => $stmt->error]);
         exit;
-    }
+    } 
 
     $stmt->close();
 
@@ -105,6 +125,25 @@ if ($action === 'get_bookings') {
     exit;
 }
 
+// ================= Download receipt =================
+if ($action === 'download_receipt') {
+    $ref = $_GET['ref'] ?? '';
+    $stmt = $db->prepare("SELECT * FROM bookings WHERE booking_ref = ?");
+    $stmt->bind_param("s", $ref);
+    $stmt->execute();
+    $booking = $stmt->get_result()->fetch_assoc();
+
+    if (!$booking) die("Booking not found");
+
+    // For a simple prototype without external libs, you can output an HTML file 
+    // that the browser can "Print to PDF", or integrate Dompdf here:
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="Receipt_'.$ref.'.pdf"');
+    
+    // Logic to render HTML to PDF would go here
+    echo "Receipt Data for " . $booking['customer_name']; 
+    exit;
+}
 
 // ================= UPDATE BOOKING =================
 if ($action === 'update_booking') {

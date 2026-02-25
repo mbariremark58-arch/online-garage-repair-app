@@ -190,8 +190,42 @@ function renderAdminDashboard() {
             <p><strong>Mechanic:</strong> ${getMechanicName(booking.mechanic_id)}</p>
         `;
 
+
         container.appendChild(card);
     });
+
+    // Update mechanic and mechanic assignment dropdowns
+    
+    bookings.forEach(booking => {
+        const card = document.createElement('div');
+        card.className = 'booking-card';
+        card.innerHTML = `
+            <h4>${booking.customer_name}</h4>
+            <select onchange="updateBooking(${booking.id}, 'status', this.value)">
+                <option value="pending" ${booking.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="in-progress" ${booking.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                <option value="completed" ${booking.status === 'completed' ? 'selected' : ''}>Completed</option>
+            </select>
+            <select onchange="updateBooking(${booking.id}, 'mechanic_id', this.value)">
+                <option value="">Assign Mechanic</option>
+                ${database.mechanics.map(m => `
+                    <option value="${m.id}" ${booking.mechanic_id == m.id ? 'selected' : ''}>${m.name}</option>
+                `).join('')}
+            </select>
+            <button onclick="downloadReceipt('${booking.booking_ref}')">Download Receipt</button>
+        `;
+        container.appendChild(card);
+    });
+
+
+async function updateBooking(id, field, value) {
+    const payload = { id: id, [field]: value };
+    await safeFetch(`${API_URL}?action=update_booking`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+    loadDatabase().then(renderAdminDashboard);
+}
 }
 
 // ================= CUSTOMER BOOKINGS =================
