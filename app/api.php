@@ -12,48 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$db = new mysqli('localhost', 'root', '', 'car_repair_shop');
+require_once 'config.php';
 
-if ($db->connect_error) {
-    echo json_encode(['error' => 'Database connection failed']);
-    exit;
-}
-
-$db->set_charset('utf8');
-
-
-// ================= CREATE TABLES =================
-$db->query("CREATE TABLE IF NOT EXISTS mechanics (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    specialization VARCHAR(100),
-    experience VARCHAR(50)
-)");
-
-$db->query("CREATE TABLE IF NOT EXISTS bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_ref VARCHAR(50) UNIQUE,
-    customer_name VARCHAR(100),
-    customer_email VARCHAR(100),
-    customer_phone VARCHAR(20),
-    car_make VARCHAR(50),
-    car_model VARCHAR(50),
-    car_year VARCHAR(4),
-    license_plate VARCHAR(20),
-    issue_description TEXT,
-    preferred_date DATE,
-    preferred_time TIME,
-    status VARCHAR(50) DEFAULT 'pending',
-    mechanic_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)");
-
-$db->query("CREATE TABLE IF NOT EXISTS notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT,
-    message TEXT,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)");
+$action = $_GET['action'] ?? '';
 
 // ================= GET MECHANICS =================
 if ($action === 'get_mechanics') {
@@ -66,19 +27,6 @@ if ($action === 'get_mechanics') {
     exit;
 }
 
-// ================= INSERT SAMPLE MECHANICS =================
-$result = $db->query("SELECT COUNT(*) as count FROM mechanics");
-$row = $result->fetch_assoc();
-
-if ($row['count'] == 0) {
-    $db->query("INSERT INTO mechanics (name, specialization, experience) VALUES
-        ('John Smith', 'Engine & Transmission', '10 years'),
-        ('Sarah Johnson', 'Brakes & Suspension', '8 years'),
-        ('Mike Williams', 'Electrical Systems', '12 years'),
-        ('Emily Brown', 'General Maintenance', '6 years')");
-}
-
-$action = $_GET['action'] ?? '';
 
 
 // ================= CREATE BOOKING =================

@@ -78,7 +78,7 @@ function updateAdminStats(){
     const bookings = database.bookings;
     document.getElementById('totalBookings').textContent = bookings.length;
     document.getElementById('pendingBookings').textContent = bookings.filter(b => b.status === 'pending').length;
-    document.getElementById('inProgressBookings').textContent = bookings.filter(b => b.status === 'in_progress').length;
+    document.getElementById('inProgressBookings').textContent = bookings.filter(b => b.status === 'in-progress').length;
     document.getElementById('completedBookings').textContent = bookings.filter(b => b.status === 'completed').length;
 }
 

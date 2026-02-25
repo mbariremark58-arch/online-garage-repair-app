@@ -96,7 +96,7 @@ if ($conn->query($sql) === TRUE) {
 }
 
 // Insert sample bookings
-$sql = "INSERT INTO bookings (id, customer_name, customer_email, customer_phone, car_make, car_model, car_year, license_plate, issue_description, preferred_date, preferred_time, status, mechanic_id) VALUES
+$sql = "INSERT INTO bookings (booking_ref, customer_name, customer_email, customer_phone, car_make, car_model, car_year, license_plate, issue_description, preferred_date, preferred_time, status, mechanic_id) VALUES
     ('BK1704900000001', 'Alice Thompson', 'alice.thompson@email.com', '(555) 123-4567', 'Toyota', 'Camry', '2020', 'ABC-1234', 'Engine making unusual rattling noise when accelerating.', '2026-01-15', '09:00:00', 'pending', NULL),
     ('BK1704900000002', 'Robert Martinez', 'robert.m@email.com', '(555) 234-5678', 'Honda', 'Civic', '2019', 'XYZ-5678', 'Brake pads need replacement. Squeaking sound when braking.', '2026-01-14', '14:00:00', 'in-progress', 2),
     ('BK1704900000003', 'Jennifer Lee', 'jennifer.lee@email.com', '(555) 345-6789', 'Ford', 'Explorer', '2021', 'DEF-9012', 'Oil change and general maintenance checkup needed.', '2026-01-13', '10:30:00', 'completed', 1)
