@@ -1,84 +1,39 @@
-# AutoFix - Online Garage Repair App
+# AutoFix - Car Repair Shop Management System
 
-**AutoFix** is a web-based application designed to streamline car repair shop operations. It allows customers to book services online and track their repair status, while providing shop administrators with a dashboard to manage bookings, assign mechanics, and update repair progress.
+AutoFix is a web-based prototype application designed to help a car repair shop manage its operations. It provides a seamless interface for customers to book and track repair services, alongside an admin dashboard to manage those bookings and assign mechanics.
 
 ## 🚀 Features
 
-### For Customers
+### Customer Portal
+* **Online Booking:** Customers can submit their vehicle details, issue descriptions, and preferred appointment times.
+* **Real-time Tracking:** Customers can track the status of their repair by entering their email address.
 
-* **Easy Online Booking:** Schedule appointments by providing vehicle details, issue description, and preferred date/time.
-* **Real-Time Tracking:** Check the status of a vehicle repair (Pending, In-Progress, Completed) using an email address.
-* **Service Overview:** View available services such as engine repair, brake service, and oil changes.
+### Admin Dashboard
+* **Statistics Overview:** View total, pending, in-progress, and completed bookings at a glance.
+* **Booking Management:** Filter and view customer bookings.
+* **Mechanic Assignment:** Track which mechanics are assigned to specific repairs.
 
-### For Administrators
+## 🛠️ Tech Stack
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript.
+* **Backend:** PHP.
+* **Database:** MySQL.
 
-* **Admin Dashboard:** View key statistics including total bookings, pending requests, and completed jobs.
-* **Workflow Management:**
-* **Assign Mechanics:** Allocate specific mechanics to bookings.
-* **Update Status:** Move bookings through the workflow (Pending → In-Progress → Completed).
-
-
-* **Filter & Search:** Filter bookings by status to organize workflow.
-
-## 🛠️ Technologies Used
-
-* **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
-* **Backend:** PHP
-* **Database:** MySQL
-
-## 📂 Project Structure
-
-```text
-/app
-├── api.php             # REST API for handling frontend requests
-├── config.php          # Database connection configuration
-├── setup.php           # Script to initialize the database and tables
-├── landing.html        # Public landing page with services info
-├── main.html           # Main app interface (Booking & Admin Dashboard)
-├── style.css           # Styles for the main application
-├── landing.css         # Styles for the landing page
-├── script.js           # Frontend logic for the main app
-└── landingscript.js    # Logic for the landing page interactions
-
-```
+## 📂 File Structure
+* `landing.html`, `landing.css`, `landingscript.js` - The promotional frontend landing page.
+* `main.php` - The core application interface housing both the Customer and Admin views.
+* `style.css` - Styling for the main application portal.
+* `script.js` - Frontend logic for handling UI toggles, API fetching, and DOM rendering.
+* `api.php` - The RESTful PHP API handling CRUD operations for bookings and mechanics.
+* `config.php` - Database connection configuration.
+* `setup.php` - One-click database installation and seeding script.
 
 ## ⚙️ Installation & Setup
 
-### Prerequisites
-
-* A local server environment like **XAMPP**, **WAMP**, or **MAMP**.
-* **PHP** and **MySQL** installed.
-
-### Steps
-
-1. **Clone or Download** the repository.
-2. Move the project folder into your server's root directory (e.g., `C:\xampp\htdocs\autofix`).
-3. **Start your server** (Apache and MySQL).
-4. **Initialize the Database:**
-* Open your browser and navigate to: `http://localhost/autofix/app/setup.php`
-* This script will automatically create the `car_repair_shop` database and necessary tables (`bookings`, `mechanics`, `notifications`).
-
-
-5. **Launch the App:**
-* Go to: `http://localhost/autofix/app/landing.html`
-
-
-
-## 📖 Usage Guide
-
-### Customer View
-
-1. Navigate to the **Home** page (`landing.html`) and click **"Book Now"**.
-2. Fill out the booking form with your contact and vehicle information.
-3. To track a booking, enter your email address in the "Track Your Booking" section to see the status of your repairs.
-
-### Admin View
-
-1. In the main application (`main.html`), click the **"Admin"** tab.
-2. Use the dashboard to view all incoming requests.
-3. Use the dropdown menu on a booking card to **Assign a Mechanic**.
-4. Click **"Start Work"** or **"Complete"** to update the status of a repair job.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
+1. **Environment:** Ensure you have a local server environment installed (such as XAMPP, WAMP, or LAMP) running PHP and MySQL.
+2. **Clone/Move Files:** Place the project folder into your server's root directory (e.g., `htdocs` for XAMPP).
+3. **Database Configuration:** The app connects using the default `root` user with no password. If your MySQL credentials differ, update the constants in `config.php`:
+   ```php
+   define('DB_HOST', 'localhost');
+   define('DB_USER', 'your_username');
+   define('DB_PASS', 'your_password');
+   define('DB_NAME', 'car_repair_shop');
