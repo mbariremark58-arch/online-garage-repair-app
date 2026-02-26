@@ -271,6 +271,12 @@ function renderAdminDashboard() {
                         </option>
                     `).join('')}
                 </select>
+                
+                ${booking.status === 'in-progress' ? `
+                    <button class="btn btn-success" style="padding: 6px 12px; margin-left: 10px;" onclick="window.markCompleted(${booking.id})">
+                        Mark Completed
+                    </button>
+                ` : ''}
             </div>
         `;
         container.appendChild(card);
@@ -305,6 +311,33 @@ window.manualAssign = async function(bookingId, mechanicId) {
         showNotification('Mechanic assigned manually');
         await loadDatabase(true);
         renderAdminDashboard();
+    }
+};
+
+// Complete updating 
+
+window.markCompleted = async function(bookingId) {
+    if (!confirm("Are you sure you want to mark this repair as completed?")) return;
+
+    const data = { id: bookingId, status: 'completed' };
+    
+    try {
+        const res = await safeFetch(`${API_URL}?action=update_booking`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        if (res.success) {
+            showNotification('Order marked as completed');
+            await loadDatabase(true);
+            renderAdminDashboard();
+            updateAdminStats();
+        } else {
+            showNotification(res.error || 'Failed to update order status', 'error');
+        }
+    } catch (error) {
+        showNotification('Server error while updating status', 'error');
     }
 };
 
