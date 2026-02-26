@@ -99,30 +99,39 @@
     <!-- Admin View -->
     <div id="adminView" class="view-section">
         <div class="container">
-            <section class="admin-dashboard">
-                <h2>Admin Dashboard</h2>
+            <section id="adminLoginSection">
+                <h2>Admin Login</h2>
+                <form id="adminLoginForm" class="booking-form">
+                    <div class="form-group">
+                        <label for="adminUser">Username</label>
+                        <input type="text" id="adminUser" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPass">Password</label>
+                        <input type="password" id="adminPass" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </section>
+
+            <section id="adminDashboardContent" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Admin Dashboard</h2>
+                    <div class="admin-top-actions">
+                        <button id="autoAssignBtn" class="btn btn-success">✨ Auto-Assign Pending</button>
+                        <button id="adminLogoutBtn" class="btn btn-secondary">Logout</button>
+                    </div>
+                </div>
                 
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3 id="totalBookings">0</h3>
-                        <p>Total Bookings</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 id="pendingBookings">0</h3>
-                        <p>Pending</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 id="inProgressBookings">0</h3>
-                        <p>In Progress</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 id="completedBookings">0</h3>
-                        <p>Completed</p>
-                    </div>
+                    <div class="stat-card"><h3 id="totalBookings">0</h3><p>Total</p></div>
+                    <div class="stat-card"><h3 id="pendingBookings">0</h3><p>Pending</p></div>
+                    <div class="stat-card"><h3 id="inProgressBookings">0</h3><p>In Progress</p></div>
+                    <div class="stat-card"><h3 id="completedBookings">0</h3><p>Completed</p></div>
                 </div>
 
                 <div class="filters">
-                    <label>Filter by Status:</label>
+                    <label>Filter Status:</label>
                     <select id="statusFilter">
                         <option value="all">All</option>
                         <option value="pending">Pending</option>
